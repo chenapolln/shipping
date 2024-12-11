@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown with Shipping Info</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 20px;
+        color: #333;
+      }
+      .dropdown {
+        margin: 20px 0;
+      }
+      .dropdown select {
+        padding: 10px;
+        font-size: 16px;
+      }
+      .shipping-info {
+        display: none;
+        margin-top: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+      }
+      .notice {
+        background-color: #fff5f5;
+        padding: 15px;
+        border: 1px solid #f8d7da;
+        color: #721c24;
+        border-radius: 5px;
+      }
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px; /* 圆角边框 */
+        background-color: #fff; /* 白色背景 */
+        font-size: 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+        appearance: none; /* 去除浏览器默认样式 */
+      }
+
+      select:hover {
+        border-color: #007bff; /* 鼠标悬停时改变边框颜色 */
+      }
+
+      select:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* 聚焦时增加边框阴影 */
+      }
+
+      .dynamic-text {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SHIPPING</h1>
+    <h3 style="text-align: center">
+      Please select your country from the dropdown below to see your shipping
+      price and options.
+    </h3>
+
+    <div class="dropdown">
+      <label for="shipping-options">Select your country:</label>
+      <select id="shipping-options">
+        <option value="" disabled selected>Select a country</option>
+        <option value="australia">Australia</option>
+        <option value="canada">Canada</option>
+        <option value="usa">United States</option>
+        <option value="hongkong">Hong kong</option>
+        <option value="japan">Japan</option>
+        <option value="newzealand">New Zealand</option>
+        <option value="singapore">Singapore</option>
+        <option value="puertorico">Puerto Rico</option>
+        <option value="mexico">Mexico</option>
+        <option value="uk">United Kingdom</option>
+        <option value="germany">Germany</option>
+        <option value="france">France</option>
+        <option value="austria">Austria</option>
+        <option value="belgium">Belgium</option>
+        <option value="croatia">Croatia</option>
+        <option value="denmark">Denmark</option>
+        <option value="finland">Finland</option>
+        <option value="greece">Greece</option>
+        <option value="hungary">Hungary</option>
+        <option value="ireland">Ireland</option>
+        <option value="italy">Italy</option>
+        <option value="netherlands">Netherlands</option>
+        <option value="northernireland">Northern Ireland</option>
+        <option value="norway">Norway</option>
+        <option value="poland">Poland</option>
+        <option value="portugal">Portugal</option>
+        <option value="slovenia">Slovenia</option>
+        <option value="spain">Spain</option>
+        <option value="sweden">Sweden</option>
+        <option value="switzerland">Switzerland</option>
+      </select>
+    </div>
+
+    <div id="shipping-info" class="shipping-info">
+      <h2>Shipping Information</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Shipped By</th>
+            <th>Delivery Time</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody id="shipping-details"></tbody>
+      </table>
+      <p id="shipping-note"></p>
+      <div class="notice">
+        <strong>NOTICE:</strong> Please allow up to 7 business days for your
+        order to be dispatched. We are currently experiencing a high volume of
+        orders due to the holiday period. ❤️
+      </div>
+    </div>
+
+    <script>
+      const dropdown = document.getElementById('shipping-options');
+      const shippingInfo = document.getElementById('shipping-info');
+      const shippingDetails = document.getElementById('shipping-details');
+      const shippingNote = document.getElementById('shipping-note');
+
+      // Shipping data for each country
+      const shippingData = {
+        australia: {
+          rows: `
+          <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$12.99 AUD<br>Free for orders over $298 AUD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$6.99 AUD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges. ',
+        },
+        canada: {
+          rows: `
+          <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$7.99 USD<br>Free for orders over $198 USD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$3.99 USD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        usa: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$7.99 USD<br>Free for orders over $198 USD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$3.99 USD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        hongkong: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$7.99 USD<br>Free for orders over $198 USD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$3.99 USD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        japan: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$7.99 USD<br>Free for orders over $198 USD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$3.99 USD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        newzealand: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$12.99 AUD<br>Free for orders over $298 AUD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$6.99 AUD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges. ',
+        },
+        singapore: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$7.99 USD<br>Free for orders over $198 USD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$3.99 USD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        puertorico: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$7.99 USD<br>Free for orders over $198 USD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$3.99 USD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        mexico: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>$7.99 USD<br>Free for orders over $198 USD</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>$3.99 USD</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        uk: {
+          rows: `
+          <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>£5.99 GBP<br>Free for orders over £158 GBP</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>£2.99 GBP</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        germany: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        france: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        austria: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        belgium: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        croatia: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        denmark: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        finland: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        greece: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        hungary: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        ireland: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        italy: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        netherlands: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        northernireland: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        norway: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        poland: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        portugal: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        slovenia: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        spain: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        sweden: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+        switzerland: {
+          rows: `
+        <tr>
+            <td>Priority Shipping</td>
+            <td>3-7 Business Days</td>
+            <td>€7.99 EUR<br>Free for orders over €198 EUR</td>
+          </tr>
+          <tr>
+            <td>Standard Shipping</td>
+            <td>5-10 Business Days</td>
+            <td>€3.99 EUR</td>
+          </tr>
+        `,
+          note: 'Delivery estimated timeframes are based on averages with the carrier & do not include dispatch timeframes.Custom Fees or Import Taxes may be charged to countries outside Australia. MISMI does not take responsibility for any fees that may occur, the recipient must cover these charges.',
+        },
+      };
+
+      dropdown.addEventListener('change', function () {
+        const selectedCountry = this.value;
+        if (shippingData[selectedCountry]) {
+          shippingDetails.innerHTML = shippingData[selectedCountry].rows;
+          shippingNote.textContent = shippingData[selectedCountry].note;
+          shippingInfo.style.display = 'block';
+        } else {
+          shippingInfo.style.display = 'none';
+        }
+      });
+    </script>
+  </body>
+</html>
